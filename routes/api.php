@@ -10,5 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('tickets')->group(function () {
     Route::post('/', [TicketController::class, 'store'])->middleware('throttle:10,1');
-    Route::get('statistics', [TicketController::class, 'statistics']);
 });

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Services\API\CustomerService;
 use App\Http\Services\API\TicketService;
+use App\Models\Ticket;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -33,10 +35,5 @@ class TicketController extends Controller
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
-    }
-
-    public function statistics(Request $request)
-    {
-        //
     }
 }
