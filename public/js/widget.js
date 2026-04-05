@@ -86,6 +86,9 @@ btnSubmit.addEventListener('click', async function () {
                 Object.entries(data.errors).forEach(([field, messages]) => {
                     showFieldError(field, messages[0]);
                 });
+            } else if (response.status === 429) {
+                alertErrorText.textContent = 'Слишком много запросов. Пожалуйста, попробуйте позже.';
+                alertError.classList.add('show');
             } else {
                 alertErrorText.textContent = data.message || 'Произошла ошибка. Попробуйте ещё раз.';
                 alertError.classList.add('show');

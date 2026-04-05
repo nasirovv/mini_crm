@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Customer;
+use App\Models\Ticket;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -31,6 +33,33 @@ class StoreTicketRequest extends FormRequest
             'files'       => ['nullable', 'array', 'max:5'],
             'files.*'     => ['file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($validator->errors()->any()) {
+                return;
+            }
+
+            $email = $this->input('email');
+            $phone = $this->input('phone');
+
+            $hasTicketToday = Ticket::query()
+                ->whereDate('created_at', today())
+                ->whereHas('customer', function ($query) use ($email, $phone) {
+                    $query->where('email', $email)
+                        ->orWhere('phone', $phone);
+                })
+                ->exists();
+
+            if ($hasTicketToday) {
+                $validator->errors()->add(
+                    'email',
+                    'Вы уже отправляли заявку сегодня. Повторная отправка возможна через 24 часа.'
+                );
+            }
+        });
     }
 
     public function messages(): array

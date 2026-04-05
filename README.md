@@ -1,58 +1,220 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini CRM
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Система управления заявками с публичным виджетом обратной связи.
 
-## About Laravel
+## Возможности
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Публичный виджет** — встраиваемая форма обратной связи (iframe), с drag-and-drop загрузкой файлов
+- **Панель администратора** — дашборд со статистикой, управление заявками и клиентами
+- **Роли и права** — admin (полный доступ), manager (заявки + клиенты)
+- **Управление заявками** — фильтрация, смена статуса, просмотр вложений
+- **База клиентов** — поиск, связь с заявками
+- **API** — приём заявок с rate-limiting (10 запросов/мин)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Стек
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3+
+- Laravel 13
+- Spatie Media Library (вложения)
+- Spatie Permission (роли и права)
+- MySQL
 
-## Learning Laravel
+## Установка
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Клонировать репозиторий
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repo-url> crm
+cd crm
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Установить зависимости
 
-## Contributing
+```bash
+composer install
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Настроить окружение
 
-## Code of Conduct
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Отредактируйте `.env` — укажите подключение к БД:
 
-## Security Vulnerabilities
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=crm
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Установите `APP_URL` на адрес вашего сервера (например `http://127.0.0.1:8000`).
 
-## License
+### 4. Создать БД и запустить миграции с сидами
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate --seed
+```
+
+### 5. Создать символическую ссылку для файлов
+
+```bash
+php artisan storage:link
+```
+
+### 6. Запустить
+
+```bash
+npm run dev
+```
+
+Это запустит параллельно: Laravel сервер, очередь, логи и Vite.
+
+Или по отдельности:
+
+```bash
+php artisan serve
+php artisan queue:listen
+```
+
+Приложение будет доступно по адресу `http://127.0.0.1:8000`.
+
+## Тестовые пользователи
+
+| Роль    | Email             | Пароль   |
+|---------|-------------------|----------|
+| Admin   | admin@gmail.com   | password |
+| Manager | manager@gmail.com | password |
+
+## Структура проекта
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── API/
+│   │   │   └── TicketController.php        # Приём заявок через API
+│   │   └── WEB/
+│   │       ├── AuthController.php          # Логин / логаут
+│   │       ├── WidgetController.php        # Публичный виджет
+│   │       └── Admin/
+│   │           ├── DashboardController.php # Дашборд со статистикой
+│   │           ├── TicketController.php    # CRUD заявок
+│   │           └── CustomerController.php  # Просмотр клиентов
+│   ├── Services/
+│   │   ├── API/
+│   │   │   ├── TicketService.php           # Создание заявки
+│   │   │   └── CustomerService.php         # Создание/поиск клиента
+│   │   └── Admin/
+│   │       ├── TicketService.php           # Статистика, фильтрация, статусы
+│   │       └── CustomerService.php         # Список, поиск клиентов
+│   ├── Middleware/
+│   │   └── AllowIframeEmbedding.php        # Разрешает iframe встраивание
+│   └── Requests/
+│       └── StoreTicketRequest.php          # Валидация формы заявки
+├── Models/
+│   ├── User.php
+│   ├── Customer.php                        # name, email, phone
+│   └── Ticket.php                          # topic, description, status
+database/
+├── migrations/                             # 10 миграций
+├── factories/                              # User, Customer, Ticket
+└── seeders/
+    ├── RoleSeeder.php                      # Роли и права
+    ├── UserSeeder.php                      # Тестовые пользователи
+    ├── CustomerSeeder.php                  # 30 клиентов
+    └── TicketSeeder.php                    # Заявки для каждого клиента
+resources/views/
+├── widget.blade.php                        # Публичная форма
+├── auth/login.blade.php                    # Страница входа
+├── admin/
+│   ├── dashboard.blade.php                 # Дашборд
+│   ├── tickets/index.blade.php             # Список заявок
+│   ├── tickets/show.blade.php              # Детали заявки
+│   ├── customers/index.blade.php           # Список клиентов
+│   └── customers/show.blade.php            # Детали клиента
+└── layouts/
+    ├── admin.blade.php                     # Основной layout
+    └── pagination.blade.php                # Пагинация
+public/
+├── css/admin.css                           # Стили админки
+├── css/login.css                           # Стили логина
+├── css/widget.css                          # Стили виджета
+├── js/admin.js                             # JS админки
+└── js/widget.js                            # JS виджета
+```
+
+## Маршруты
+
+### Публичные
+
+| Метод | URL       | Описание             |
+|-------|-----------|----------------------|
+| GET   | `/widget` | Форма обратной связи |
+| GET   | `/login`  | Страница входа       |
+| POST  | `/login`  | Авторизация          |
+
+### API
+
+| Метод | URL            | Описание                    |
+|-------|----------------|-----------------------------|
+| POST  | `/api/tickets` | Создать заявку (10 req/min) |
+
+### Админ-панель (требуется авторизация)
+
+| Метод  | URL                             | Права            | Описание           |
+|--------|---------------------------------|-------------------|---------------------|
+| GET    | `/admin/dashboard`              | —                 | Дашборд            |
+| DELETE | `/admin/logout`                 | —                 | Выход              |
+| GET    | `/admin/tickets`                | manage-tickets    | Список заявок      |
+| GET    | `/admin/tickets/{id}`           | manage-tickets    | Детали заявки      |
+| PATCH  | `/admin/tickets/{id}/status`    | manage-tickets    | Смена статуса      |
+| GET    | `/admin/customers`              | manage-customers  | Список клиентов    |
+| GET    | `/admin/customers/{id}`         | manage-customers  | Детали клиента     |
+
+## Роли и права
+
+| Право            | admin | manager |
+|------------------|-------|---------|
+| manage-users     | +     | —       |
+| manage-tickets   | +     | +       |
+| manage-customers | +     | +       |
+
+## Статусы заявок
+
+| Значение     | Название  | Описание                                        |
+|--------------|-----------|-------------------------------------------------|
+| `new`        | Новый     | Заявка только создана                            |
+| `on_process` | В работе  | Заявка взята в обработку                         |
+| `done`       | Обработан | Заявка закрыта, фиксируется кто и когда ответил |
+
+## Виджет
+
+Виджет можно встроить на любой сайт через iframe:
+
+```html
+<iframe src="https://your-domain.com/widget" width="100%" height="600" frameborder="0"></iframe>
+```
+
+Поддерживает:
+- Загрузку до 5 файлов (jpg, png, pdf, doc, docx), до 10 МБ каждый
+- Drag-and-drop
+- Валидацию формы на клиенте и сервере
+- Формат телефона: +998XXXXXXXXX
+
+## Валидация заявки (API)
+
+| Поле        | Правила                                      |
+|-------------|----------------------------------------------|
+| name        | обязательно, строка, макс. 255               |
+| email       | обязательно, email, макс. 255                |
+| phone       | обязательно, формат E.164 (+998...)          |
+| topic       | обязательно, строка, макс. 255               |
+| description | обязательно, строка, макс. 5000              |
+| files       | необязательно, массив, макс. 5 файлов        |
+| files.*     | файл, макс. 10 МБ, jpg/jpeg/png/pdf/doc/docx |
