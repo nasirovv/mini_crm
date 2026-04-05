@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WEB\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\Admin\CustomerService;
+use Illuminate\Http\Request;
 
 /**
  * Class CustomerController
@@ -11,11 +12,12 @@ use App\Http\Services\Admin\CustomerService;
  */
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $customers = CustomerService::getInstance()->getCustomersPaginated();
+        $filters = $request->only(['search']);
+        $customers = CustomerService::getInstance()->getCustomersPaginated($filters);
 
-        return view('admin.customers.index', compact('customers'));
+        return view('admin.customers.index', compact('customers', 'filters'));
     }
 
     public function show(int $customer)

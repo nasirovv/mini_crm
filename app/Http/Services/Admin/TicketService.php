@@ -36,12 +36,35 @@ class TicketService
     }
 
     /**
+     * @param array $filters
      * @param int $perPage
      * @return LengthAwarePaginator
      */
-    public function getTicketsPaginated(int $perPage = 15): LengthAwarePaginator
+    public function getTicketsPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return Ticket::query()->with(['customer', 'answeredBy'])->latest()->paginate($perPage);
+        $query = Ticket::query()->with(['customer', 'answeredBy']);
+
+        if (!empty($filters['email'])) {
+            $query->whereHas('customer', fn($q) => $q->where('email', 'like', '%' . $filters['email'] . '%'));
+        }
+
+        if (!empty($filters['phone'])) {
+            $query->whereHas('customer', fn($q) => $q->where('phone', 'like', '%' . $filters['phone'] . '%'));
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
+        }
+
+        return $query->latest()->paginate($perPage)->withQueryString();
     }
 
     public function getTicketById(int $id): Ticket

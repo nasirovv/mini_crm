@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WEB\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\Admin\TicketService;
+use Illuminate\Http\Request;
 
 /**
  * Class TicketController
@@ -11,11 +12,12 @@ use App\Http\Services\Admin\TicketService;
  */
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = TicketService::getInstance()->getTicketsPaginated();
+        $filters = $request->only(['email', 'phone', 'status', 'date_from', 'date_to']);
+        $tickets = TicketService::getInstance()->getTicketsPaginated($filters);
 
-        return view('admin.tickets.index', compact('tickets'));
+        return view('admin.tickets.index', compact('tickets', 'filters'));
     }
 
     public function show(int $ticket)

@@ -8,6 +8,21 @@
         <p>Список всех клиентов</p>
     </div>
 
+    <div class="card" style="margin-bottom: 16px;">
+        <form method="GET" action="{{ route('admin.customers.index') }}" class="filter-form">
+            <div class="filter-row">
+                <div class="filter-group" style="flex: 1;">
+                    <label>Поиск</label>
+                    <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Имя, email, телефон...">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary btn-sm">Найти</button>
+                    <a href="{{ route('admin.customers.index') }}" class="btn btn-sm" style="background: #f1f5f9; color: #475569;">Сбросить</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="card">
         <div class="table-wrapper">
             <table>

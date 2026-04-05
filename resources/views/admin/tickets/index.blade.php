@@ -8,6 +8,42 @@
         <p>Список всех заявок</p>
     </div>
 
+    <div class="card" style="margin-bottom: 16px;">
+        <form method="GET" action="{{ route('admin.tickets.index') }}" class="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Email</label>
+                    <input type="text" name="email" value="{{ $filters['email'] ?? '' }}" placeholder="Email клиента...">
+                </div>
+                <div class="filter-group">
+                    <label>Телефон</label>
+                    <input type="text" name="phone" value="{{ $filters['phone'] ?? '' }}" placeholder="Телефон клиента...">
+                </div>
+                <div class="filter-group">
+                    <label>Статус</label>
+                    <select name="status">
+                        <option value="">Все</option>
+                        <option value="new" {{ ($filters['status'] ?? '') === 'new' ? 'selected' : '' }}>Новый</option>
+                        <option value="on_process" {{ ($filters['status'] ?? '') === 'on_process' ? 'selected' : '' }}>В работе</option>
+                        <option value="done" {{ ($filters['status'] ?? '') === 'done' ? 'selected' : '' }}>Обработан</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Дата от</label>
+                    <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}">
+                </div>
+                <div class="filter-group">
+                    <label>Дата до</label>
+                    <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary btn-sm">Найти</button>
+                    <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm" style="background: #f1f5f9; color: #475569;">Сбросить</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="card">
         <div class="table-wrapper">
             <table>

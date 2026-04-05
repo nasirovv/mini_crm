@@ -15,9 +15,20 @@ class CustomerService
         return new static();
     }
 
-    public function getCustomersPaginated(int $perPage = 15): LengthAwarePaginator
+    public function getCustomersPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return Customer::query()->withCount('tickets')->latest()->paginate($perPage);
+        $query = Customer::query()->withCount('tickets');
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->paginate($perPage)->withQueryString();
     }
 
     public function getCustomerById(int $id): Customer
