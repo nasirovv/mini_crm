@@ -10,6 +10,12 @@
         </div>
     </div>
 
+    @if (session('success'))
+        <div class="alert-success" style="background: #d1fae5; color: #047857; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; margin-bottom: 16px; border: 1px solid #a7f3d0;">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="card" style="margin-bottom: 16px;">
         <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Информация</h2>
         <table>
@@ -28,9 +34,21 @@
                             'done' => 'Обработан',
                         ];
                     @endphp
-                    <span class="badge badge-{{ $ticket->status }}">
-                        {{ $statusLabels[$ticket->status] ?? $ticket->status }}
-                    </span>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="badge badge-{{ $ticket->status }}">
+                            {{ $statusLabels[$ticket->status] ?? $ticket->status }}
+                        </span>
+                        <form method="POST" action="{{ route('admin.tickets.update-status', $ticket) }}" style="display: flex; align-items: center; gap: 6px;">
+                            @csrf
+                            @method('PATCH')
+                            <select name="status" class="status-select">
+                                <option value="new" {{ $ticket->status === 'new' ? 'selected' : '' }}>Новый</option>
+                                <option value="on_process" {{ $ticket->status === 'on_process' ? 'selected' : '' }}>В работе</option>
+                                <option value="done" {{ $ticket->status === 'done' ? 'selected' : '' }}>Обработан</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             <tr>

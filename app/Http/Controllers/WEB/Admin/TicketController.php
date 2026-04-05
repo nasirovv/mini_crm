@@ -26,4 +26,15 @@ class TicketController extends Controller
 
         return view('admin.tickets.show', compact('ticket'));
     }
+
+    public function updateStatus(Request $request, int $ticket)
+    {
+        $request->validate([
+            'status' => 'required|in:new,on_process,done',
+        ]);
+
+        TicketService::getInstance()->updateStatus($ticket, $request->input('status'), auth()->id());
+
+        return back()->with('success', 'Статус обновлён');
+    }
 }

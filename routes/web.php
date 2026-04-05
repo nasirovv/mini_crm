@@ -20,12 +20,13 @@ Route::middleware('auth')->prefix('admin')->as('admin.')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::delete('logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::prefix('tickets')->as('tickets.')->group(function () {
+    Route::middleware('permission:manage-tickets')->prefix('tickets')->as('tickets.')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('index');
         Route::get('{ticket}', [TicketController::class, 'show'])->name('show');
+        Route::patch('{ticket}/status', [TicketController::class, 'updateStatus'])->name('update-status');
     });
 
-    Route::prefix('customers')->as('customers.')->group(function () {
+    Route::middleware('permission:manage-customers')->prefix('customers')->as('customers.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
         Route::get('{customer}', [CustomerController::class, 'show'])->name('show');
     });

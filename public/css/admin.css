@@ -270,6 +270,24 @@ table tbody tr:last-child td {
 
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 
+/* ── Status select ── */
+.status-select {
+    padding: 6px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    background: var(--white);
+    transition: border-color 0.2s;
+}
+
+.status-select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 /* ── Filters ── */
 .filter-form {
     display: block;

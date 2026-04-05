@@ -71,4 +71,20 @@ class TicketService
     {
         return Ticket::query()->with(['customer', 'answeredBy'])->findOrFail($id);
     }
+
+    public function updateStatus(int $id, string $status, int $userId): Ticket
+    {
+        $ticket = Ticket::query()->findOrFail($id);
+
+        $data = ['status' => $status];
+
+        if ($status === 'done') {
+            $data['answered_by'] = $userId;
+            $data['answered_date'] = now();
+        }
+
+        $ticket->update($data);
+
+        return $ticket->load(['customer', 'answeredBy']);
+    }
 }
