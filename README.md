@@ -21,21 +21,139 @@
 
 ## Установка
 
-### 1. Клонировать репозиторий
+### Вариант 1: Docker (рекомендуется)
+
+#### Требования
+
+- [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### 1. Клонировать репозиторий
 
 ```bash
 git clone <repo-url> crm
 cd crm
 ```
 
-### 2. Установить зависимости
+#### 2. Настроить окружение
+
+```bash
+cp .env.example .env
+```
+
+Отредактируйте `.env` — укажите настройки для Docker:
+
+```
+APP_URL=http://localhost:8080
+
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=mini_crm
+DB_USERNAME=crm_user
+DB_PASSWORD=secret
+```
+
+> **Важно:** `DB_HOST=db` — это имя сервиса в `docker-compose.yml`, а не `127.0.0.1`.
+
+#### 3. Собрать и запустить контейнеры
+
+```bash
+docker compose up -d --build
+```
+
+Это запустит три контейнера:
+
+| Сервис  | Контейнер  | Порт                       |
+|---------|------------|----------------------------|
+| PHP-FPM | crm-app    | 9000 (внутренний)          |
+| Nginx   | crm-nginx  | 8080 (хост) → 80 (контейнер) |
+| MySQL   | crm-db     | 3307 (хост) → 3306 (контейнер) |
+
+#### 4. Сгенерировать ключ приложения
+
+```bash
+docker compose exec app php artisan key:generate
+```
+
+#### 5. Запустить миграции и сиды
+
+```bash
+docker compose exec app php artisan migrate --seed
+```
+
+#### 6. Создать символическую ссылку для файлов
+
+```bash
+docker compose exec app php artisan storage:link
+```
+
+#### 7. Готово
+
+Приложение доступно по адресу **http://localhost:8080**
+
+## Тестовые пользователи
+
+| Роль    | Email             | Пароль     |
+|---------|-------------------|------------|
+| Admin   | admin@gmail.com   | admin123   |
+| Manager | manager@gmail.com | manager123 |
+
+#### Полезные команды Docker
+
+```bash
+# Остановить контейнеры
+docker compose down
+
+# Остановить и удалить данные БД
+docker compose down -v
+
+# Посмотреть логи
+docker compose logs -f
+
+# Логи конкретного сервиса
+docker compose logs -f app
+docker compose logs -f nginx
+docker compose logs -f db
+
+# Зайти в контейнер приложения
+docker compose exec app bash
+
+# Запустить artisan команду
+docker compose exec app php artisan <command>
+
+# Очистить кэш
+docker compose exec app php artisan optimize:clear
+
+# Пересобрать контейнеры
+docker compose up -d --build
+```
+
+---
+
+### Вариант 2: Локальная установка
+
+#### Требования
+
+- PHP 8.4+
+- Composer
+- Node.js 20+
+- MySQL 8.0
+
+#### 1. Клонировать репозиторий
+
+```bash
+git clone <repo-url> crm
+cd crm
+```
+
+#### 2. Установить зависимости
 
 ```bash
 composer install
 npm install
 ```
 
-### 3. Настроить окружение
+#### 3. Настроить окружение
 
 ```bash
 cp .env.example .env
@@ -48,26 +166,26 @@ php artisan key:generate
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=crm
+DB_DATABASE=mini_crm
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
 Установите `APP_URL` на адрес вашего сервера (например `http://127.0.0.1:8000`).
 
-### 4. Создать БД и запустить миграции с сидами
+#### 4. Создать БД и запустить миграции с сидами
 
 ```bash
 php artisan migrate --seed
 ```
 
-### 5. Создать символическую ссылку для файлов
+#### 5. Создать символическую ссылку для файлов
 
 ```bash
 php artisan storage:link
 ```
 
-### 6. Запустить
+#### 6. Запустить
 
 ```bash
 npm run dev
@@ -86,10 +204,10 @@ php artisan queue:listen
 
 ## Тестовые пользователи
 
-| Роль    | Email             | Пароль   |
-|---------|-------------------|----------|
-| Admin   | admin@gmail.com   | password |
-| Manager | manager@gmail.com | password |
+| Роль    | Email             | Пароль     |
+|---------|-------------------|------------|
+| Admin   | admin@gmail.com   | admin123   |
+| Manager | manager@gmail.com | manager123 |
 
 ## Структура проекта
 

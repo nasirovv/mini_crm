@@ -17,12 +17,14 @@ class UserSeeder extends Seeder
         $admin = User::factory()->create([
             'name'  => 'Admin',
             'email' => 'admin@gmail.com',
+            'password' => bcrypt('admin123'),
         ]);
         $admin->assignRole('admin');
 
         $manager = User::factory()->create([
             'name'  => 'Manager',
             'email' => 'manager@gmail.com',
+            'password' => bcrypt('manager123'),
         ]);
         $manager->assignRole('manager');
 
